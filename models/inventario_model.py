@@ -1,19 +1,22 @@
-from db_connection import conectar
+from db.db_connection import conectar
 
 class InventarioModel:
     @staticmethod
-    def listar():
-        conn = conectar()
-        cursor = conn.cursor(dictionary=True)
+    def listar_todos(self):
+        conexao = conectar()
+        cursor = conexao.cursor(dictionary=True)
         cursor.execute("""
-            SELECT i.*, e.nome AS equipamento
-            FROM Inventario i
-            JOIN Equipamento e ON i.id_equipamento = e.id_equipamento
+            SELECT i.id_inventario, i.nome, i.marca, i.descricao, 
+                   i.identificacao, i.setor, i.valor, 
+                   i.id_equipamento, e.nome AS equipamento
+            FROM inventario i
+            JOIN equipamento e ON i.id_equipamento = e.id_equipamento
+            ORDER BY i.id_inventario;
         """)
-        dados = cursor.fetchall()
+        resultado = cursor.fetchall()
         cursor.close()
-        conn.close()
-        return dados
+        conexao.close()
+        return resultado
 
     @staticmethod
     def adicionar(nome, marca, descricao, identificacao, setor, valor, id_equipamento):

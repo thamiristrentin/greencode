@@ -1,4 +1,4 @@
-from db_connection import conectar
+from db.db_connection import conectar
 
 class TarifaModel:
     @staticmethod

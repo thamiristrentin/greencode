@@ -1,64 +1,91 @@
 import customtkinter as ctk
+from tkinter import messagebox
 from models.inventario_model import InventarioModel
 from utils.pdf_export import exportar_pdf
-from utils.excel_export import exportar_excel
+from utils.excel_export import exportar_excel  # ✅ adiciona isso
 
 class InventarioView(ctk.CTkFrame):
     def __init__(self, master):
         super().__init__(master)
+        self.pack(fill="both", expand=True)
+        self.configure(fg_color="#f5f5f5")
 
-        ctk.CTkLabel(self, text="Inventário de Equipamentos", font=("Arial", 18, "bold")).pack(pady=10)
-        
-        form = ctk.CTkFrame(self)
-        form.pack(pady=5)
-
-        self.nome = ctk.CTkEntry(form, placeholder_text="Nome")
-        self.nome.grid(row=0, column=0, padx=5)
-        self.marca = ctk.CTkEntry(form, placeholder_text="Marca")
-        self.marca.grid(row=0, column=1, padx=5)
-        self.descricao = ctk.CTkEntry(form, placeholder_text="Descrição")
-        self.descricao.grid(row=0, column=2, padx=5)
-        self.identificacao = ctk.CTkEntry(form, placeholder_text="Identificação")
-        self.identificacao.grid(row=1, column=0, padx=5, pady=5)
-        self.setor = ctk.CTkEntry(form, placeholder_text="Setor")
-        self.setor.grid(row=1, column=1, padx=5, pady=5)
-        self.valor = ctk.CTkEntry(form, placeholder_text="Valor (R$)")
-        self.valor.grid(row=1, column=2, padx=5, pady=5)
-        self.id_equipamento = ctk.CTkEntry(form, placeholder_text="ID Equipamento")
-        self.id_equipamento.grid(row=1, column=3, padx=5, pady=5)
-
-        ctk.CTkButton(form, text="Adicionar", command=self.adicionar).grid(row=2, column=0, padx=10, pady=10)
-        ctk.CTkButton(form, text="Atualizar Lista", command=self.atualizar_lista).grid(row=2, column=1, padx=10)
-        ctk.CTkButton(form, text="Exportar PDF", command=self.exportar_pdf).grid(row=2, column=2, padx=10)
-        ctk.CTkButton(form, text="Exportar Excel", command=self.exportar_excel).grid(row=2, column=3, padx=10)
-
-        self.lista = ctk.CTkTextbox(self, width=950, height=400)
-        self.lista.pack(pady=10)
-        self.atualizar_lista()
-
-    def adicionar(self):
-        InventarioModel.adicionar(
-            self.nome.get(),
-            self.marca.get(),
-            self.descricao.get(),
-            self.identificacao.get(),
-            self.setor.get(),
-            float(self.valor.get()),
-            int(self.id_equipamento.get())
+        self.label_titulo = ctk.CTkLabel(
+            self,
+            text="📦 Inventário de Equipamentos",
+            font=("Helvetica", 20, "bold"),
+            text_color="#2b2b2b"
         )
+        self.label_titulo.pack(pady=15)
+
+        self.text_area = ctk.CTkTextbox(self, width=850, height=400, corner_radius=10)
+        self.text_area.pack(pady=10)
+
+        # Botões
+        self.btn_atualizar = ctk.CTkButton(
+            self, text="🔄 Atualizar Lista",
+            command=self.atualizar_lista,
+            fg_color="#2E8B57", hover_color="#3CB371"
+        )
+        self.btn_atualizar.pack(pady=5)
+
+        self.btn_pdf = ctk.CTkButton(
+            self, text="📄 Exportar PDF",
+            command=self.exportar_pdf_inventario,
+            fg_color="#4682B4", hover_color="#5B9BD5"
+        )
+        self.btn_pdf.pack(pady=5)
+
+        # ✅ Novo botão Excel
+        self.btn_excel = ctk.CTkButton(
+            self,
+            text="📊 Exportar Excel",
+            command=self.exportar_excel_inventario,
+            fg_color="#DAA520",
+            hover_color="#FFD700"
+        )
+        self.btn_excel.pack(pady=5)
+
         self.atualizar_lista()
 
     def atualizar_lista(self):
-        self.lista.delete("1.0", "end")
-        dados = InventarioModel.listar()
-        for i in dados:
-            linha = f"{i['id_inventario']} | {i['nome']} | {i['marca']} | {i['setor']} | {i['valor']} | Equip: {i['equipamento']}\n"
-            self.lista.insert("end", linha)
+        self.text_area.delete("1.0", "end")
+        inventario = InventarioModel().listar_todos()
+        if not inventario:
+            self.text_area.insert("end", "Nenhum item cadastrado.\n")
+            return
 
-    def exportar_pdf(self):
-        dados = InventarioModel.listar()
-        exportar_pdf("Relatório de Inventário", dados, "inventario.pdf")
+        for item in inventario:
+            linha = (
+                f"id_inventario: {item['id_inventario']} | "
+                f"nome: {item['nome']} | "
+                f"marca: {item['marca']} | "
+                f"descricao: {item['descricao']} | "
+                f"identificacao: {item['identificacao']} | "
+                f"setor: {item['setor']} | "
+                f"valor: {item['valor']} | "
+                f"id_equipamento: {item['id_equipamento']} | "
+                f"equipamento: {item['equipamento']}\n\n"
+            )
+            self.text_area.insert("end", linha)
 
-    def exportar_excel(self):
-        dados = InventarioModel.listar()
-        exportar_excel(dados, "inventario.xlsx")
+    def exportar_pdf_inventario(self):
+        try:
+            dados = InventarioModel().listar_todos()
+            if not dados:
+                messagebox.showwarning("Aviso", "Nenhum dado para exportar.")
+                return
+            exportar_pdf("Relatório de Inventário", "inventario.pdf", dados)
+        except Exception as e:
+            messagebox.showerror("Erro", f"Erro ao gerar PDF:\n{e}")
+
+    # ✅ Função nova para Excel
+    def exportar_excel_inventario(self):
+        try:
+            dados = InventarioModel().listar_todos()
+            if not dados:
+                messagebox.showwarning("Aviso", "Nenhum dado para exportar.")
+                return
+            exportar_excel("Relatório de Inventário", "inventario.xlsx", dados)
+        except Exception as e:
+            messagebox.showerror("Erro", f"Erro ao gerar Excel:\n{e}")
