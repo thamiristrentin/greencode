@@ -25,6 +25,5 @@ def exportar_pdf(titulo, nome_arquivo, dados):
 
     caminho = os.path.join(os.getcwd(), nome_arquivo)
     pdf.output(caminho)
-
     messagebox.showinfo("Exportação concluída", f"PDF salvo em:\n{caminho}")
     print(f"📄 PDF salvo em: {caminho}")
