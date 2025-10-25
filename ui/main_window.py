@@ -1,37 +1,43 @@
 import customtkinter as ctk
 from ui.equipamento_view import EquipamentoView
 from ui.inventario_view import InventarioView
-from ui.tarifa_view import TarifaView
-from ui.consumo_view import ConsumoView
-from ui.comparativo_view import ComparativoView
 from ui.relatorio_view import RelatorioView
+from ui.consumo_view import ConsumoView
+from ui.tarifa_view import TarifaView
+from ui.comparativo_view import ComparativoView
 
-class MainWindow(ctk.CTkFrame):
-    def __init__(self, master):
-        super().__init__(master)
-        self.pack(fill="both", expand=True)
+class MainWindow(ctk.CTk):
+    def __init__(self):
+        super().__init__()
+        self.title("GreenCode - Gestão de Energia")
+        self.geometry("1100x700")
+        self.resizable(True, True)
 
-        sidebar = ctk.CTkFrame(self, width=220)
-        sidebar.pack(side="left", fill="y")
+        ctk.set_appearance_mode("light")
+
+        menu = ctk.CTkFrame(self, width=200, fg_color="#1E3D34")
+        menu.pack(side="left", fill="y")
+
+        self.content = ctk.CTkFrame(self, fg_color="#f5f5f5")
+        self.content.pack(side="right", fill="both", expand=True)
 
         botoes = [
-            ("Equipamentos", EquipamentoView),
-            ("Inventário", InventarioView),
-            ("Tarifas", TarifaView),
-            ("Consumos", ConsumoView),
-            ("Comparativos", ComparativoView),
-            ("Relatórios", RelatorioView)
+            ("Equipamentos", lambda: self.mostrar_tela(EquipamentoView)),
+            ("Inventário", lambda: self.mostrar_tela(InventarioView)),
+            ("Consumos", lambda: self.mostrar_tela(ConsumoView)),
+            ("Tarifas", lambda: self.mostrar_tela(TarifaView)),
+            ("Comparativos", lambda: self.mostrar_tela(ComparativoView)),
+            ("📊 Relatórios Gerais", lambda: self.mostrar_tela(RelatorioView))
         ]
 
-        for nome, tela in botoes:
-            ctk.CTkButton(sidebar, text=nome, width=200,
-                          command=lambda t=tela: self.trocar_tela(t)).pack(pady=8)
+        for texto, comando in botoes:
+            ctk.CTkButton(menu, text=texto, command=comando, fg_color="#3CB371").pack(pady=10, padx=15, fill="x")
 
-        self.frame_principal = None
-        self.trocar_tela(EquipamentoView)
+        self.tela_atual = None
+        self.mostrar_tela(EquipamentoView)
 
-    def trocar_tela(self, tela):
-        if self.frame_principal:
-            self.frame_principal.destroy()
-        self.frame_principal = tela(self)
-        self.frame_principal.pack(fill="both", expand=True)
+    def mostrar_tela(self, TelaClasse):
+        if self.tela_atual:
+            self.tela_atual.pack_forget()
+        self.tela_atual = TelaClasse(self.content)
+        self.tela_atual.pack(fill="both", expand=True)

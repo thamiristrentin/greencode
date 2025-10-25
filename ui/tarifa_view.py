@@ -1,52 +1,41 @@
 import customtkinter as ctk
+from tkinter import messagebox, ttk
 from models.tarifa_model import TarifaModel
-from utils.pdf_export import exportar_pdf
+from utils.pdf_export import exportar_pdf_tabela
 from utils.excel_export import exportar_excel
 
 class TarifaView(ctk.CTkFrame):
-    def __init__(self, master):
-        super().__init__(master)
+    def __init__(self, parent):
+        super().__init__(parent)
+        ctk.CTkLabel(self, text="💰 Tarifas de Energia", font=("Helvetica", 20, "bold")).pack(pady=10)
 
-        ctk.CTkLabel(self, text="Gerenciamento de Tarifas", font=("Arial", 18, "bold")).pack(pady=10)
+        frame = ctk.CTkFrame(self)
+        frame.pack(pady=8, padx=10, fill="both", expand=True)
 
-        form = ctk.CTkFrame(self)
-        form.pack(pady=5)
+        cols = ["id_tarifa", "valor_kwh", "vigencia_inicio", "vigencia_fim"]
+        self.tree = ttk.Treeview(frame, columns=cols, show="headings", height=10)
+        for c in cols:
+            self.tree.heading(c, text=c.replace("_", " ").title())
+            self.tree.column(c, anchor="center", width=150)
+        self.tree.pack(fill="both", expand=True)
 
-        self.valor = ctk.CTkEntry(form, placeholder_text="Valor kWh")
-        self.valor.grid(row=0, column=0, padx=5)
-        self.inicio = ctk.CTkEntry(form, placeholder_text="Início (AAAA-MM-DD)")
-        self.inicio.grid(row=0, column=1, padx=5)
-        self.fim = ctk.CTkEntry(form, placeholder_text="Fim (AAAA-MM-DD ou NULL)")
-        self.fim.grid(row=0, column=2, padx=5)
+        btns = ctk.CTkFrame(self)
+        btns.pack(pady=10)
+        ctk.CTkButton(btns, text="🔄 Atualizar", command=self.atualizar, fg_color="#2E8B57").grid(row=0,column=0,padx=6)
+        ctk.CTkButton(btns, text="📄 PDF", command=self.pdf, fg_color="#5A5AAD").grid(row=0,column=1,padx=6)
+        ctk.CTkButton(btns, text="📊 Excel", command=self.excel, fg_color="#DAA520").grid(row=0,column=2,padx=6)
 
-        ctk.CTkButton(form, text="Adicionar", command=self.adicionar).grid(row=0, column=3, padx=10)
-        ctk.CTkButton(form, text="Atualizar Lista", command=self.atualizar_lista).grid(row=0, column=4, padx=10)
-        ctk.CTkButton(form, text="Exportar PDF", command=self.exportar_pdf).grid(row=0, column=5, padx=10)
-        ctk.CTkButton(form, text="Exportar Excel", command=self.exportar_excel).grid(row=0, column=6, padx=10)
+        self.atualizar()
 
-        self.lista = ctk.CTkTextbox(self, width=950, height=400)
-        self.lista.pack(pady=10)
-        self.atualizar_lista()
+    def atualizar(self):
+        for i in self.tree.get_children():
+            self.tree.delete(i)
+        for t in TarifaModel.listar_todas():
+            self.tree.insert("", "end", values=tuple(t.values()))
 
-    def adicionar(self):
-        TarifaModel.adicionar(
-            float(self.valor.get()),
-            self.inicio.get(),
-            self.fim.get() if self.fim.get().lower() != "null" else None
-        )
-        self.atualizar_lista()
+    def pdf(self):
+        dados = TarifaModel.listar_todas()
+        exportar_pdf_tabela("tarifas.pdf", "Tabela de Tarifas", dados, list(dados[0].keys()) if dados else [])
 
-    def atualizar_lista(self):
-        self.lista.delete("1.0", "end")
-        dados = TarifaModel.listar()
-        for t in dados:
-            linha = f"{t['id_tarifa']} | R${t['valor_kwh']} | {t['vigencia_inicio']} → {t['vigencia_fim']}\n"
-            self.lista.insert("end", linha)
-
-    def exportar_pdf(self):
-        dados = TarifaModel.listar()
-        exportar_pdf("Relatório de Tarifas", dados, "tarifas.pdf")
-
-    def exportar_excel(self):
-        dados = TarifaModel.listar()
-        exportar_excel(dados, "tarifas.xlsx")
+    def excel(self):
+        exportar_excel("tarifas.xlsx", TarifaModel.listar_todas())
