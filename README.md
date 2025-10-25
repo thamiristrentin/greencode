@@ -10,6 +10,3 @@ Ele permite:
 📄 Exportar tudo em PDF ou Excel
 
 O projeto foi desenvolvido com foco em eficiência energética e sustentabilidade, facilitando a análise de gastos e incentivando práticas mais conscientes.
-
-💡 Feito com Python, MySQL, CustomTkinter, Pandas, Matplotlib e muito café ☕.
-👩‍💻 Por Thamiris Trentin — 2025
