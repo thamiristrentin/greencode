@@ -1,4 +1,4 @@
-# ui/inventario_view.py
+
 import customtkinter as ctk
 from tkinter import messagebox, ttk
 from models.inventario_model import InventarioModel
@@ -10,7 +10,6 @@ class InventarioView(ctk.CTkFrame):
         super().__init__(parent)
         ctk.CTkLabel(self, text="📦 Inventário de Equipamentos", font=("Helvetica", 20, "bold")).pack(pady=10)
 
-        # --- FRAME DA TABELA ---
         tabela_frame = ctk.CTkFrame(self)
         tabela_frame.pack(pady=8, padx=10, fill="both", expand=True)
 
@@ -38,7 +37,6 @@ class InventarioView(ctk.CTkFrame):
         self.tree.pack(side="left", fill="both", expand=True)
         vsb.pack(side="right", fill="y")
 
-        # --- BOTÕES DE AÇÃO ---
         btn_frame = ctk.CTkFrame(self)
         btn_frame.pack(pady=10)
         ctk.CTkButton(btn_frame, text="🔄 Atualizar Lista", command=self.atualizar_lista, fg_color="#2E8B57").grid(row=0, column=0, padx=6)
@@ -46,7 +44,6 @@ class InventarioView(ctk.CTkFrame):
         ctk.CTkButton(btn_frame, text="📄 Exportar PDF", command=self.exportar_pdf_inventario, fg_color="#5A5AAD").grid(row=0, column=2, padx=6)
         ctk.CTkButton(btn_frame, text="📊 Exportar Excel", command=self.exportar_excel_inventario, fg_color="#DAA520").grid(row=0, column=3, padx=6)
 
-        # --- CAMPOS DE CADASTRO ---
         form = ctk.CTkFrame(self)
         form.pack(pady=15, padx=10, fill="x")
         self.entry_nome = ctk.CTkEntry(form, placeholder_text="Nome"); self.entry_nome.grid(row=0,column=0,padx=4)
