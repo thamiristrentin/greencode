@@ -3,23 +3,18 @@ from db.db_connection import conectar
 class RelatoriosModel:
     @staticmethod
     def obter_resumo_geral():
-        """Retorna dados gerais do sistema (totais e somas principais)."""
         conn = conectar()
         cursor = conn.cursor(dictionary=True)
 
-        # Total de equipamentos
         cursor.execute("SELECT COUNT(*) AS total_equipamentos FROM equipamento")
         total_equipamentos = cursor.fetchone()["total_equipamentos"]
 
-        # Total de itens de inventário
         cursor.execute("SELECT COUNT(*) AS total_inventario FROM inventario")
         total_inventario = cursor.fetchone()["total_inventario"]
 
-        # Total de registros de consumo
         cursor.execute("SELECT COUNT(*) AS total_consumos FROM consumo")
         total_consumos = cursor.fetchone()["total_consumos"]
 
-        # Economia total (soma em reais)
         cursor.execute("SELECT COALESCE(SUM(economia_reais), 0) AS total_economia FROM comparativo")
         total_economia = cursor.fetchone()["total_economia"]
 
@@ -34,10 +29,7 @@ class RelatoriosModel:
 
     @staticmethod
     def listar_todos():
-        """
-        Retorna dados completos para o relatório:
-        inclui totais gerais e tabela detalhada com cálculo de economia.
-        """
+        
         conn = conectar()
         cursor = conn.cursor(dictionary=True)
         cursor.execute("""
@@ -66,7 +58,6 @@ class RelatoriosModel:
         tabela = cursor.fetchall()
         conn.close()
 
-        # Pega o resumo geral
         resumo = RelatoriosModel.obter_resumo_geral()
 
         return {
