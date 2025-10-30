@@ -1,9 +1,9 @@
-# models/relatorios.py
 from db.db_connection import conectar
 
 class RelatoriosModel:
     @staticmethod
     def obter_resumo_geral():
+        """Retorna dados gerais do sistema (totais e somas principais)."""
         conn = conectar()
         cursor = conn.cursor(dictionary=True)
 
@@ -33,33 +33,46 @@ class RelatoriosModel:
         }
 
     @staticmethod
-    def listar_detalhado():
+    def listar_todos():
         """
-        Retorna uma lista de visão geral combinando dados de todas as tabelas.
-        Ideal para exportar relatórios completos (PDF/Excel).
+        Retorna dados completos para o relatório:
+        inclui totais gerais e tabela detalhada com cálculo de economia.
         """
         conn = conectar()
         cursor = conn.cursor(dictionary=True)
         cursor.execute("""
             SELECT 
                 e.nome AS equipamento,
-                e.quantidade,
-                e.potencia_watts,
-                e.horas_uso_diario,
-                i.setor,
-                t.valor_kwh,
-                c.consumo_mensal_kwh,
-                c.custo_mensal,
-                comp.economia_kwh,
-                comp.economia_reais
+                i.setor AS setor,
+                e.potencia_watts AS potencia,
+                c.consumo_mensal_kwh AS consumo_kwh,
+                c.custo_mensal AS custo,
+                COALESCE(
+                    comp.economia_reais, 
+                    ROUND(
+                        (comp.consumo_atual_kwh - comp.consumo_futuro_kwh)
+                        * (c.custo_mensal / NULLIF(c.consumo_mensal_kwh, 0)),
+                        2
+                    ),
+                    0
+                ) AS economia
             FROM consumo c
             JOIN equipamento e ON c.id_equipamento = e.id_equipamento
-            JOIN tarifa t ON c.id_tarifa = t.id_tarifa
             LEFT JOIN inventario i ON i.id_equipamento = e.id_equipamento
             LEFT JOIN consumos_has_comparativos ch ON ch.id_consumo = c.id_consumo
             LEFT JOIN comparativo comp ON comp.id_comparativo = ch.id_comparativo
             ORDER BY e.nome
         """)
-        dados = cursor.fetchall()
+        tabela = cursor.fetchall()
         conn.close()
-        return dados
+
+        # Pega o resumo geral
+        resumo = RelatoriosModel.obter_resumo_geral()
+
+        return {
+            "equipamentos": resumo["total_equipamentos"],
+            "inventario": resumo["total_inventario"],
+            "consumo": resumo["total_consumos"],
+            "economia_total": resumo["total_economia"],
+            "tabela": tabela
+        }

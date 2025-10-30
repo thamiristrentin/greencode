@@ -110,6 +110,8 @@ class RelatorioView(ctk.CTkFrame):
         except Exception as e:
             messagebox.showerror("Erro", f"Falha ao atualizar relatório:\n{e}")
 
+
+
     # === GRÁFICO DE CONSUMO X ECONOMIA ===
     def atualizar_grafico(self, dados):
         # Limpa gráfico anterior
