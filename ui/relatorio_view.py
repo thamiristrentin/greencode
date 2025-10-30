@@ -64,7 +64,6 @@ class RelatorioView(ctk.CTkFrame):
 
         self.atualizar_tela()
 
-    # === CARD TEMPLATE ===
     def criar_card(self, parent, titulo, valor, coluna):
         card = ctk.CTkFrame(parent, fg_color="white", corner_radius=8)
         card.grid(row=0, column=coluna, padx=10, pady=5)
@@ -77,7 +76,6 @@ class RelatorioView(ctk.CTkFrame):
         try:
             dados = RelatoriosModel.listar_todos()
 
-            # Atualiza cards
             self.card_eqp.configure(text=str(dados["equipamentos"]))
             self.card_inv.configure(text=str(dados["inventario"]))
             self.card_cons.configure(text=str(dados["consumo"]))
