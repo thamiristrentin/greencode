@@ -102,7 +102,6 @@ class RelatorioView(ctk.CTkFrame):
 
 
     def atualizar_grafico(self, dados):
-        # Limpa gráfico anterior
         for widget in self.grafico_frame.winfo_children():
             widget.destroy()
 
