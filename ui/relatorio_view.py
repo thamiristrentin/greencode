@@ -12,13 +12,11 @@ class RelatorioView(ctk.CTkFrame):
         super().__init__(parent)
         self.configure(fg_color="#f5f5f5")
 
-        # === TÍTULO ===
         ctk.CTkLabel(
             self, text="📊 Relatórios Gerais",
             font=("Helvetica", 20, "bold")
         ).pack(pady=10)
 
-        # === CARDS DE DADOS ===
         cards_frame = ctk.CTkFrame(self, fg_color="transparent")
         cards_frame.pack(pady=5)
 
@@ -27,7 +25,6 @@ class RelatorioView(ctk.CTkFrame):
         self.card_cons = self.criar_card(cards_frame, "⚡ Registros de Consumo", "0", 2)
         self.card_eco = self.criar_card(cards_frame, "💰 Economia Total (R$)", "0.00", 3)
 
-        # === TABELA ===
         tabela_frame = ctk.CTkFrame(self)
         tabela_frame.pack(pady=15, padx=10, fill="both", expand=True)
 
@@ -55,11 +52,9 @@ class RelatorioView(ctk.CTkFrame):
         self.tree.pack(side="left", fill="both", expand=True)
         vsb.pack(side="right", fill="y")
 
-        # === GRÁFICO ===
         self.grafico_frame = ctk.CTkFrame(self)
         self.grafico_frame.pack(pady=10, padx=10, fill="both", expand=True)
 
-        # === BOTÕES ===
         btn_frame = ctk.CTkFrame(self)
         btn_frame.pack(pady=10)
 
@@ -78,7 +73,6 @@ class RelatorioView(ctk.CTkFrame):
         label_valor.pack(pady=(0, 8))
         return label_valor
 
-    # === ATUALIZAR TELA COMPLETA ===
     def atualizar_tela(self):
         try:
             dados = RelatoriosModel.listar_todos()
@@ -89,11 +83,9 @@ class RelatorioView(ctk.CTkFrame):
             self.card_cons.configure(text=str(dados["consumo"]))
             self.card_eco.configure(text=f"R$ {dados['economia_total']:.2f}")
 
-            # Limpa tabela
             for item in self.tree.get_children():
                 self.tree.delete(item)
 
-            # Insere tabela formatada
             for d in dados["tabela"]:
                 self.tree.insert("", "end", values=(
                     d["equipamento"],
@@ -104,7 +96,6 @@ class RelatorioView(ctk.CTkFrame):
                     f"{d['economia']:.2f}"
                 ))
 
-            # Atualiza gráfico
             self.atualizar_grafico(dados["tabela"])
 
         except Exception as e:
@@ -112,7 +103,6 @@ class RelatorioView(ctk.CTkFrame):
 
 
 
-    # === GRÁFICO DE CONSUMO X ECONOMIA ===
     def atualizar_grafico(self, dados):
         # Limpa gráfico anterior
         for widget in self.grafico_frame.winfo_children():
@@ -138,7 +128,6 @@ class RelatorioView(ctk.CTkFrame):
         canvas.draw()
         canvas.get_tk_widget().pack(fill="both", expand=True)
 
-    # === EXPORTAR PDF ===
     def exportar_pdf(self):
         try:
             dados = RelatoriosModel.listar_todos()["tabela"]
@@ -152,7 +141,6 @@ class RelatorioView(ctk.CTkFrame):
         except Exception as e:
             messagebox.showerror("Erro", f"Erro ao exportar PDF:\n{e}")
 
-    # === EXPORTAR EXCEL ===
     def exportar_excel(self):
         try:
             dados = RelatoriosModel.listar_todos()["tabela"]
