@@ -31,7 +31,6 @@ class InventarioView(ctk.CTkFrame):
             self.tree.heading(col, text=title)
             self.tree.column(col, anchor="center", width=120)
 
-        # Scrollbar
         vsb = ttk.Scrollbar(tabela_frame, orient="vertical", command=self.tree.yview)
         self.tree.configure(yscroll=vsb.set)
         self.tree.pack(side="left", fill="both", expand=True)
