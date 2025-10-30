@@ -10,3 +10,5 @@ Ele permite:
 📄 Exportar tudo em PDF ou Excel
 
 O projeto foi desenvolvido com foco em eficiência energética e sustentabilidade, facilitando a análise de gastos e incentivando práticas mais conscientes.
+
+Por Thamiris Trentin
