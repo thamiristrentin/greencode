@@ -11,4 +11,7 @@ Ele permite:
 
 O projeto foi desenvolvido com foco em eficiência energética e sustentabilidade, facilitando a análise de gastos e incentivando práticas mais conscientes.
 
+Para instalar dependências do projeto, rode no temrinal: 
+    pip install -r requirements.txt
+
 Por Thamiris Trentin
